@@ -2,7 +2,7 @@
 
 namespace Application.DTOs
 {
-    internal class ProductCreateDTO
+    public class ProductCreateDTO
     {
         [Required]
         public string Name { get; set; }
