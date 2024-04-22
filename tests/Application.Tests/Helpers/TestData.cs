@@ -22,21 +22,6 @@ namespace Application.Tests.Helpers
             return product;
         }
 
-        public static ProductDTO GenerateProductDTO()
-        {
-            var productDTO = new ProductDTO
-            {
-                ID = 1,
-                Name = "Test Product",
-                ManufacturePhone = "1234567890",
-                ManufactureEmail = "test@example.com",
-                ProduceDate = DateOnly.FromDateTime(DateTime.Now),
-                IsAvailable = true
-            };
-
-            return productDTO;
-        }
-
         public static ProductCreateDTO GenerateProducCreatetDTO()
         {
             var productCreateDTO = new ProductCreateDTO
