@@ -62,16 +62,13 @@ namespace Infrastructure.Tests.Repositories
         [Test]
         public async Task GetAllAsync_WithoutFilter_ReturnsAllItems()
         {
-            // Arrange
             var product1 = TestData.GenerateProduct();
             var product2 = TestData.GenerateProduct();
             await _dbContext.Products.AddRangeAsync(product1, product2);
             await _dbContext.SaveChangesAsync();
 
-            // Act
             var items = await _repository.GetAllAsync();
 
-            // Assert
             Assert.That(items, Is.Not.Null);
             Assert.That(items.Count, Is.EqualTo(2));
         }
@@ -79,15 +76,12 @@ namespace Infrastructure.Tests.Repositories
         [Test]
         public async Task GetAsync_WithFilter_ReturnsSingleItem()
         {
-            // Arrange
             var product = TestData.GenerateProduct();
             await _dbContext.Products.AddAsync(product);
             await _dbContext.SaveChangesAsync();
 
-            // Act
             var retrievedItem = await _repository.GetAsync(p => p.ManufactureEmail == product.ManufactureEmail);
 
-            // Assert
             Assert.That(retrievedItem, Is.Not.Null);
             Assert.That(retrievedItem.ManufactureEmail, Is.EqualTo(product.ManufactureEmail));
         }
@@ -95,16 +89,13 @@ namespace Infrastructure.Tests.Repositories
         [Test]
         public async Task RemoveAsync_RemovesItem()
         {
-            // Arrange
             var product = TestData.GenerateProduct();
             await _dbContext.Products.AddAsync(product);
             await _dbContext.SaveChangesAsync();
 
-            // Act
             await _repository.RemoveAsync(product);
             var retrievedItem = await _repository.GetAsync(p => p.ManufactureEmail == product.ManufactureEmail);
 
-            // Assert
             Assert.That(retrievedItem, Is.Null);
         }
     }
