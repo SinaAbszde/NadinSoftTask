@@ -13,40 +13,43 @@ namespace Infrastructure.Tests
         private Product _product;
 
         [SetUp]
-        public void Setup()
+        public async Task Setup()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .UseSqlite($"DataSource=:memory:;Cache=Shared") // Had to use Sqlite because the in-memory database didn't enforce unique constraints
                 .Options;
 
             _db = new ApplicationDbContext(options);
+            _db.Database.OpenConnection();
+            _db.Database.EnsureCreated();
 
             _product = TestData.GenerateProduct();
 
             _db.Products.Add(_product);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
         [Test]
-        public async Task UniqueIndexOnManufactureEmailAndProduceDate_ShouldPreventDuplicates() // This test isn't going as expected. I'll get back to it later
+        public async Task UniqueIndexOnManufactureEmailAndProduceDate_ShouldPreventDuplicates()
         {
-            var product = new Product
+            var duplicateProduct = new Product
             {
-                Name = "Test Product",
-                ManufacturePhone = "1234567890",
+                Name = "Duplicate Test Product",
+                ManufacturePhone = "0987654321",
                 ManufactureEmail = _product.ManufactureEmail,
                 ProduceDate = _product.ProduceDate,
-                IsAvailable = true
+                IsAvailable = false
             };
 
-            _db.Products.Add(product);
+            _db.Products.Add(duplicateProduct);
 
             Assert.ThrowsAsync<DbUpdateException>(async () => await _db.SaveChangesAsync());
         }
 
         [TearDown]
-        public void TearDown()
+        public async Task TearDown()
         {
+            await _db.Database.CloseConnectionAsync();
             _db.Dispose();
         }
     }
