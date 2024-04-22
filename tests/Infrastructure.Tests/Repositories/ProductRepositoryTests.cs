@@ -32,7 +32,7 @@ namespace Infrastructure.Tests.Repositories
         [Test]
         public async Task CreateAsync_AddsProductAndSetsProduceDate()
         {
-            var product = TestData.CreateTestProduct();
+            var product = TestData.GenerateProduct();
 
             await _repository.CreateAsync(product);
             var result = await _dbContext.Products.FirstOrDefaultAsync(p => p.ID == product.ID);
@@ -45,7 +45,7 @@ namespace Infrastructure.Tests.Repositories
         [Test]
         public async Task UpdateAsync_UpdatesProduct()
         {
-            var product = TestData.CreateTestProduct();
+            var product = TestData.GenerateProduct();
             await _dbContext.Products.AddAsync(product);
             await _dbContext.SaveChangesAsync();
 
@@ -63,8 +63,8 @@ namespace Infrastructure.Tests.Repositories
         public async Task GetAllAsync_WithoutFilter_ReturnsAllItems()
         {
             // Arrange
-            var product1 = TestData.CreateTestProduct();
-            var product2 = TestData.CreateTestProduct();
+            var product1 = TestData.GenerateProduct();
+            var product2 = TestData.GenerateProduct();
             await _dbContext.Products.AddRangeAsync(product1, product2);
             await _dbContext.SaveChangesAsync();
 
@@ -80,7 +80,7 @@ namespace Infrastructure.Tests.Repositories
         public async Task GetAsync_WithFilter_ReturnsSingleItem()
         {
             // Arrange
-            var product = TestData.CreateTestProduct();
+            var product = TestData.GenerateProduct();
             await _dbContext.Products.AddAsync(product);
             await _dbContext.SaveChangesAsync();
 
@@ -96,7 +96,7 @@ namespace Infrastructure.Tests.Repositories
         public async Task RemoveAsync_RemovesItem()
         {
             // Arrange
-            var product = TestData.CreateTestProduct();
+            var product = TestData.GenerateProduct();
             await _dbContext.Products.AddAsync(product);
             await _dbContext.SaveChangesAsync();
 

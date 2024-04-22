@@ -6,7 +6,7 @@ namespace Infrastructure.Tests.Helpers
     {
         private static int _productCounter = 1;
 
-        public static Product CreateTestProduct()
+        public static Product GenerateProduct()
         {
             var product = new Product
             {
