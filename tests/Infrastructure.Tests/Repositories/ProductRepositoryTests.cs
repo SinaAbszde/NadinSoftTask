@@ -9,7 +9,7 @@ namespace Infrastructure.Tests.Repositories
     [TestFixture]
     public class ProductRepositoryTests
     {
-        private ApplicationDbContext _dbContext;
+        private ApplicationDbContext _db;
         private ProductRepository _repository;
 
         [SetUp]
@@ -19,14 +19,14 @@ namespace Infrastructure.Tests.Repositories
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()) // Unique name for each test run
                 .Options;
 
-            _dbContext = new ApplicationDbContext(options);
-            _repository = new ProductRepository(_dbContext);
+            _db = new ApplicationDbContext(options);
+            _repository = new ProductRepository(_db);
         }
 
         [TearDown]
         public void TearDown()
         {
-            _dbContext.Dispose();
+            _db.Dispose();
         }
 
         [Test]
@@ -35,7 +35,7 @@ namespace Infrastructure.Tests.Repositories
             var product = TestData.GenerateProduct();
 
             await _repository.CreateAsync(product);
-            var result = await _dbContext.Products.FirstOrDefaultAsync(p => p.ID == product.ID);
+            var result = await _db.Products.FirstOrDefaultAsync(p => p.ID == product.ID);
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result.ProduceDate, Is.EqualTo(DateOnly.FromDateTime(DateTime.Now)));
@@ -46,13 +46,13 @@ namespace Infrastructure.Tests.Repositories
         public async Task UpdateAsync_UpdatesProduct()
         {
             var product = TestData.GenerateProduct();
-            await _dbContext.Products.AddAsync(product);
-            await _dbContext.SaveChangesAsync();
+            await _db.Products.AddAsync(product);
+            await _db.SaveChangesAsync();
 
             product.Name = "Updated Product";
             product.IsAvailable = false;
             await _repository.UpdateAsync(product);
-            var result = await _dbContext.Products.FirstOrDefaultAsync(p => p.ID == product.ID);
+            var result = await _db.Products.FirstOrDefaultAsync(p => p.ID == product.ID);
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Name, Is.EqualTo("Updated Product"));
@@ -64,8 +64,8 @@ namespace Infrastructure.Tests.Repositories
         {
             var product1 = TestData.GenerateProduct();
             var product2 = TestData.GenerateProduct();
-            await _dbContext.Products.AddRangeAsync(product1, product2);
-            await _dbContext.SaveChangesAsync();
+            await _db.Products.AddRangeAsync(product1, product2);
+            await _db.SaveChangesAsync();
 
             var items = await _repository.GetAllAsync();
 
@@ -77,8 +77,8 @@ namespace Infrastructure.Tests.Repositories
         public async Task GetAsync_WithFilter_ReturnsSingleItem()
         {
             var product = TestData.GenerateProduct();
-            await _dbContext.Products.AddAsync(product);
-            await _dbContext.SaveChangesAsync();
+            await _db.Products.AddAsync(product);
+            await _db.SaveChangesAsync();
 
             var retrievedItem = await _repository.GetAsync(p => p.ManufactureEmail == product.ManufactureEmail);
 
@@ -90,8 +90,8 @@ namespace Infrastructure.Tests.Repositories
         public async Task RemoveAsync_RemovesItem()
         {
             var product = TestData.GenerateProduct();
-            await _dbContext.Products.AddAsync(product);
-            await _dbContext.SaveChangesAsync();
+            await _db.Products.AddAsync(product);
+            await _db.SaveChangesAsync();
 
             await _repository.RemoveAsync(product);
             var retrievedItem = await _repository.GetAsync(p => p.ManufactureEmail == product.ManufactureEmail);
