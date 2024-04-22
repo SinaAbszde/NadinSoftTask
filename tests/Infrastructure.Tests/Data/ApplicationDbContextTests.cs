@@ -4,7 +4,7 @@ using Infrastructure.Tests.Helpers;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
-namespace Infrastructure.Tests
+namespace Infrastructure.Tests.Data
 {
     [TestFixture]
     public class ApplicationDbContextTests

@@ -3,7 +3,7 @@ using Application.Tests.Helpers;
 using NUnit.Framework;
 using System.ComponentModel.DataAnnotations;
 
-namespace Application.Tests
+namespace Application.Tests.DTOs
 {
     [TestFixture]
     public class ProductUpdateDTOValidationTests
