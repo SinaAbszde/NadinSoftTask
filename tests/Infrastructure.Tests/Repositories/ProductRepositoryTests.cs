@@ -1,6 +1,6 @@
-﻿using Domain.Models;
-using Infrastructure.Data;
+﻿using Infrastructure.Data;
 using Infrastructure.Repositories;
+using Infrastructure.Tests.Helpers;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
@@ -32,13 +32,7 @@ namespace Infrastructure.Tests.Repositories
         [Test]
         public async Task CreateAsync_AddsProductAndSetsProduceDate()
         {
-            var product = new Product
-            {
-                Name = "Test Product",
-                ManufacturePhone = "1234567890",
-                ManufactureEmail = "test@example.com",
-                IsAvailable = true
-            };
+            var product = TestData.CreateTestProduct();
 
             await _repository.CreateAsync(product);
             var result = await _dbContext.Products.FirstOrDefaultAsync(p => p.ID == product.ID);
@@ -51,14 +45,7 @@ namespace Infrastructure.Tests.Repositories
         [Test]
         public async Task UpdateAsync_UpdatesProduct()
         {
-            var product = new Product
-            {
-                ID = 1,
-                Name = "Test Product",
-                ManufacturePhone = "1234567890",
-                ManufactureEmail = "test@example.com",
-                IsAvailable = true
-            };
+            var product = TestData.CreateTestProduct();
             await _dbContext.Products.AddAsync(product);
             await _dbContext.SaveChangesAsync();
 
@@ -70,6 +57,55 @@ namespace Infrastructure.Tests.Repositories
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Name, Is.EqualTo("Updated Product"));
             Assert.That(result.IsAvailable, Is.False);
+        }
+
+        [Test]
+        public async Task GetAllAsync_WithoutFilter_ReturnsAllItems()
+        {
+            // Arrange
+            var product1 = TestData.CreateTestProduct();
+            var product2 = TestData.CreateTestProduct();
+            await _dbContext.Products.AddRangeAsync(product1, product2);
+            await _dbContext.SaveChangesAsync();
+
+            // Act
+            var items = await _repository.GetAllAsync();
+
+            // Assert
+            Assert.That(items, Is.Not.Null);
+            Assert.That(items.Count, Is.EqualTo(2));
+        }
+
+        [Test]
+        public async Task GetAsync_WithFilter_ReturnsSingleItem()
+        {
+            // Arrange
+            var product = TestData.CreateTestProduct();
+            await _dbContext.Products.AddAsync(product);
+            await _dbContext.SaveChangesAsync();
+
+            // Act
+            var retrievedItem = await _repository.GetAsync(p => p.ManufactureEmail == product.ManufactureEmail);
+
+            // Assert
+            Assert.That(retrievedItem, Is.Not.Null);
+            Assert.That(retrievedItem.ManufactureEmail, Is.EqualTo(product.ManufactureEmail));
+        }
+
+        [Test]
+        public async Task RemoveAsync_RemovesItem()
+        {
+            // Arrange
+            var product = TestData.CreateTestProduct();
+            await _dbContext.Products.AddAsync(product);
+            await _dbContext.SaveChangesAsync();
+
+            // Act
+            await _repository.RemoveAsync(product);
+            var retrievedItem = await _repository.GetAsync(p => p.ManufactureEmail == product.ManufactureEmail);
+
+            // Assert
+            Assert.That(retrievedItem, Is.Null);
         }
     }
 }
