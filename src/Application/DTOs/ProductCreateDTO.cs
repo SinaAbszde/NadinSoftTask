@@ -8,9 +8,11 @@ namespace Application.DTOs
         public string Name { get; set; }
 
         [Required]
+        [MaxLength(11)]
         public string ManufacturePhone { get; set; }
 
         [Required]
+        [EmailAddress]
         public string ManufactureEmail { get; set; }
 
         public bool IsAvailable { get; set; }
