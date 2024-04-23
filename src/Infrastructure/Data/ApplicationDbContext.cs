@@ -20,6 +20,11 @@ namespace Infrastructure.Data
             modelBuilder.Entity<Product>()
                 .HasIndex(p => new { p.ManufactureEmail, p.ProduceDate })
                 .IsUnique(true);
+
+            modelBuilder.Entity<Product>()
+                .HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(p => p.UserId);
         }
     }
 }

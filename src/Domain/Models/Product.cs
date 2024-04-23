@@ -1,4 +1,6 @@
-﻿namespace Domain.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Domain.Models
 {
     public class Product
     {
@@ -8,5 +10,7 @@
         public string ManufacturePhone { get; set; }
         public string ManufactureEmail { get; set; }
         public bool IsAvailable { get; set; }
+        [ForeignKey("UserId")]
+        public string UserId { get; set; }
     }
 }
