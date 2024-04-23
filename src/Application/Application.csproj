@@ -14,4 +14,9 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Interfaces\Auth\" />
+    <Folder Include="Interfaces\Repositories\" />
+  </ItemGroup>
+
 </Project>

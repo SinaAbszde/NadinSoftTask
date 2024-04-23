@@ -1,7 +1,7 @@
 ﻿using Domain.Interfaces;
 using Domain.Models;
 
-namespace Application.Interfaces
+namespace Application.Interfaces.Repositories
 {
     public interface IProductRepository : IRepository<Product>
     {
