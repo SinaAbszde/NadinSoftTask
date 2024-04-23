@@ -1,7 +1,9 @@
 using Application.Interfaces;
 using Application.Mapping;
 using Infrastructure.Data;
+using Infrastructure.Identity;
 using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +13,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection"));
 });
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddControllers();
