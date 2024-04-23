@@ -22,6 +22,8 @@ namespace Infrastructure.Repositories
 
         public async Task UpdateAsync(Product entity)
         {
+            var product = await GetAsync(u => u.ID == entity.ID, tracked: false);
+            entity.ProduceDate = product.ProduceDate;
             _db.Products.Update(entity);
             await SaveAsync();
         }
