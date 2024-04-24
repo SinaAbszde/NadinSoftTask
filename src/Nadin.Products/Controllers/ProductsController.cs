@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Nadin.Products.Responses;
+using System.Linq.Expressions;
 using System.Net;
 
 namespace Nadin.Products.Controllers
@@ -31,11 +32,25 @@ namespace Nadin.Products.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetAllProducts()
+        public async Task<ActionResult<APIResponse>> GetAllProducts(string? username)
         {
+            Expression<Func<Product, bool>>? userFilter = null;
+
+            if (username != null)
+            {
+                var user = await _userManager.FindByNameAsync(username);
+                if (user == null)
+                {
+                    _response.IsSuccess = false;
+                    _response.ErrorMessages = ["Invalid Username!"];
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    return BadRequest(_response);
+                }
+                userFilter = u => u.UserId == user.Id;
+            }
             try
             {
-                IEnumerable<Product> products = await _dbProduct.GetAllAsync();
+                IEnumerable<Product> products = await _dbProduct.GetAllAsync(userFilter);
                 _response.Result = _mapper.Map<List<ProductDTO>>(products);
                 _response.StatusCode = HttpStatusCode.OK;
                 _response.IsSuccess = true;
