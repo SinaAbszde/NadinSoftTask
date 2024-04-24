@@ -1,13 +1,14 @@
 ﻿using Application.Interfaces.Auth;
+using Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Services
 {
     public class UserLogoutService : IUserLogoutService
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public UserLogoutService(SignInManager<IdentityUser> signInManager)
+        public UserLogoutService(SignInManager<ApplicationUser> signInManager)
         {
             _signInManager = signInManager;
         }
