@@ -37,8 +37,10 @@ namespace Nadin.Products.Controllers
             }
             catch (Exception ex)
             {
+                _response.StatusCode = HttpStatusCode.InternalServerError;
                 _response.IsSuccess = false;
-                _response.ErrorMessages = new List<string>() { ex.Message };
+                _response.ErrorMessages = new List<string> { ex.Message };
+                return StatusCode(500, _response);
             }
             return _response;
         }
@@ -68,8 +70,10 @@ namespace Nadin.Products.Controllers
             }
             catch (Exception ex)
             {
+                _response.StatusCode = HttpStatusCode.InternalServerError;
                 _response.IsSuccess = false;
-                _response.ErrorMessages = new List<string>() { ex.Message };
+                _response.ErrorMessages = new List<string> { ex.Message };
+                return StatusCode(500, _response);
             }
             return _response;
         }
@@ -81,13 +85,16 @@ namespace Nadin.Products.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> CreateProduct([FromBody] ProductCreateDTO createDTO)
         {
+            if (!ModelState.IsValid)
+            {
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                _response.IsSuccess = false;
+                _response.ErrorMessages = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList();
+                return BadRequest(_response);
+            }
+
             try
             {
-                if (createDTO == null)
-                {
-                    return BadRequest(createDTO);
-                }
-
                 Product product = _mapper.Map<Product>(createDTO);
 
                 await _dbProduct.CreateAsync(product);
@@ -97,19 +104,22 @@ namespace Nadin.Products.Controllers
             }
             catch (DbUpdateException ex)
             {
+                _response.StatusCode = HttpStatusCode.InternalServerError;
                 _response.IsSuccess = false;
                 if (ex.InnerException is SqlException sqlEx)
                 {
                     _response.ErrorMessages = ["A Product with the same Date and Manufacture Email already exists!"];
-                    return _response;
+                    return StatusCode(500, _response);
                 }
                 _response.ErrorMessages = new List<string>() { ex.Message };
-                return _response;
+                return StatusCode(500, _response);
             }
             catch (Exception ex)
             {
+                _response.StatusCode = HttpStatusCode.InternalServerError;
                 _response.IsSuccess = false;
-                _response.ErrorMessages = new List<string>() { ex.Message };
+                _response.ErrorMessages = new List<string> { ex.Message };
+                return StatusCode(500, _response);
             }
             return _response;
         }
@@ -140,8 +150,10 @@ namespace Nadin.Products.Controllers
             }
             catch (Exception ex)
             {
+                _response.StatusCode = HttpStatusCode.InternalServerError;
                 _response.IsSuccess = false;
-                _response.ErrorMessages = new List<string>() { ex.Message };
+                _response.ErrorMessages = new List<string> { ex.Message };
+                return StatusCode(500, _response);
             }
             return _response;
         }
@@ -153,14 +165,16 @@ namespace Nadin.Products.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> UpdateProduct([FromBody] ProductUpdateDTO updateDTO)
         {
+            if (!ModelState.IsValid)
+            {
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                _response.IsSuccess = false;
+                _response.ErrorMessages = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList();
+                return BadRequest(_response);
+            }
+
             try
             {
-                if (updateDTO == null)
-                {
-                    _response.StatusCode = HttpStatusCode.BadRequest;
-                    return BadRequest(_response);
-                }
-
                 var product = await _dbProduct.GetAsync(u => u.ID == updateDTO.ID, tracked: false);
 
                 if (product == null)
@@ -177,19 +191,22 @@ namespace Nadin.Products.Controllers
             }
             catch (DbUpdateException ex)
             {
+                _response.StatusCode = HttpStatusCode.InternalServerError;
                 _response.IsSuccess = false;
                 if (ex.InnerException is SqlException sqlEx)
                 {
                     _response.ErrorMessages = ["A Product with the same Date and Manufacture Email already exists!"];
-                    return _response;
+                    return StatusCode(500, _response);
                 }
                 _response.ErrorMessages = new List<string>() { ex.Message };
-                return _response;
+                return StatusCode(500, _response);
             }
             catch (Exception ex)
             {
+                _response.StatusCode = HttpStatusCode.InternalServerError;
                 _response.IsSuccess = false;
-                _response.ErrorMessages = new List<string>() { ex.Message };
+                _response.ErrorMessages = new List<string> { ex.Message };
+                return StatusCode(500, _response);
             }
             return _response;
         }
