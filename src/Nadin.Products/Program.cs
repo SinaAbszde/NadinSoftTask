@@ -1,8 +1,10 @@
+using Application.Interfaces.Auth;
 using Application.Interfaces.Repositories;
 using Application.Mapping;
 using Infrastructure.Data;
 using Infrastructure.Identity;
 using Infrastructure.Repositories;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,8 +18,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
 builder.Services.AddAutoMapper(typeof(MappingConfig));
+
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IUserRegistrationService, UserRegistrationService>();
+builder.Services.AddScoped<IUserLoginService, UserLoginService>();
+builder.Services.AddScoped<IUserLogoutService, UserLogoutService>();
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
