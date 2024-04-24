@@ -16,7 +16,7 @@ namespace Infrastructure.Services
 
         public async Task<SignInResult> LoginAsync(LoginDTO loginDto)
         {
-            return await _signInManager.PasswordSignInAsync(loginDto.Email, loginDto.Password, loginDto.RememberMe, lockoutOnFailure: false);
+            return await _signInManager.PasswordSignInAsync(loginDto.UserName, loginDto.Password, loginDto.RememberMe, lockoutOnFailure: false);
         }
     }
 }

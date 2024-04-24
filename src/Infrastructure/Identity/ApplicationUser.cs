@@ -7,5 +7,8 @@ namespace Infrastructure.Identity
     {
         [Required]
         public string FullName { get; set; }
+
+        [Required]
+        public override string UserName { get; set; }
     }
 }

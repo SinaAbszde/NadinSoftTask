@@ -16,7 +16,16 @@ namespace Infrastructure.Services
 
         public async Task<IdentityResult> RegisterUserAsync(RegisterDTO registerDTO)
         {
-            var user = new ApplicationUser { UserName = registerDTO.Email, Email = registerDTO.Email, FullName = registerDTO.FullName };
+            var existingUser = await _userManager.FindByNameAsync(registerDTO.UserName);
+            if (existingUser != null)
+            {
+                return IdentityResult.Failed(new IdentityError
+                {
+                    Description = $"Username '{registerDTO.UserName}' is already taken."
+                });
+            }
+
+            var user = new ApplicationUser { UserName = registerDTO.UserName, Email = registerDTO.Email, FullName = registerDTO.FullName };
             return await _userManager.CreateAsync(user, registerDTO.Password);
         }
     }

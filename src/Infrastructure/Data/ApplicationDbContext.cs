@@ -25,6 +25,10 @@ namespace Infrastructure.Data
                 .HasOne<ApplicationUser>()
                 .WithMany()
                 .HasForeignKey(p => p.UserId);
+
+            modelBuilder.Entity<ApplicationUser>()
+                .HasIndex(u => u.UserName)
+                .IsUnique();
         }
     }
 }

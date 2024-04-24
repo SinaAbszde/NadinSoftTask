@@ -5,8 +5,7 @@ namespace Application.DTOs.Auth
     public class LoginDTO
     {
         [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+        public string UserName { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
