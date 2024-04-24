@@ -2,6 +2,9 @@
 using Application.Interfaces.Repositories;
 using AutoMapper;
 using Domain.Models;
+using Infrastructure.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -15,10 +18,12 @@ namespace Nadin.Products.Controllers
     public class ProductsController : ControllerBase
     {
         protected APIResponse _response;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IProductRepository _dbProduct;
         private readonly IMapper _mapper;
-        public ProductsController(IProductRepository dbProduct, IMapper mapper)
+        public ProductsController(UserManager<ApplicationUser> userManager, IProductRepository dbProduct, IMapper mapper)
         {
+            _userManager = userManager;
             _dbProduct = dbProduct;
             _mapper = mapper;
             _response = new();
@@ -78,6 +83,7 @@ namespace Nadin.Products.Controllers
             return _response;
         }
 
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -96,7 +102,7 @@ namespace Nadin.Products.Controllers
             try
             {
                 Product product = _mapper.Map<Product>(createDTO);
-
+                product.UserId = _userManager.GetUserId(User);
                 await _dbProduct.CreateAsync(product);
                 _response.Result = _mapper.Map<ProductDTO>(product);
                 _response.StatusCode = HttpStatusCode.Created;
@@ -124,10 +130,12 @@ namespace Nadin.Products.Controllers
             return _response;
         }
 
+        [Authorize]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> DeleteProduct(int id)
         {
@@ -144,6 +152,13 @@ namespace Nadin.Products.Controllers
                     _response.StatusCode = HttpStatusCode.NotFound;
                     return NotFound(_response);
                 }
+                if (product.UserId != _userManager.GetUserId(User))
+                {
+                    _response.StatusCode = HttpStatusCode.Forbidden;
+                    _response.IsSuccess = false;
+                    _response.ErrorMessages = ["You can't delete Products created by others!"];
+                    return StatusCode(403, _response);
+                }
                 await _dbProduct.RemoveAsync(product);
                 _response.StatusCode = HttpStatusCode.NoContent;
                 _response.IsSuccess = true;
@@ -158,10 +173,12 @@ namespace Nadin.Products.Controllers
             return _response;
         }
 
+        [Authorize]
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> UpdateProduct([FromBody] ProductUpdateDTO updateDTO)
         {
@@ -182,8 +199,15 @@ namespace Nadin.Products.Controllers
                     _response.StatusCode = HttpStatusCode.NotFound;
                     return NotFound(_response);
                 }
+                if (product.UserId != _userManager.GetUserId(User))
+                {
+                    _response.StatusCode = HttpStatusCode.Forbidden;
+                    _response.IsSuccess = false;
+                    _response.ErrorMessages = ["You can't update Products created by others!"];
+                    return StatusCode(403, _response);
+                }
                 Product updateProduct = _mapper.Map<Product>(updateDTO);
-
+                updateProduct.UserId = product.UserId;
                 await _dbProduct.UpdateAsync(updateProduct);
                 _response.Result = _mapper.Map<ProductDTO>(updateProduct);
                 _response.StatusCode = HttpStatusCode.NoContent;
