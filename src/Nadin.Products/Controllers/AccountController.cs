@@ -1,6 +1,9 @@
 ﻿using Application.DTOs.Auth;
 using Application.Interfaces.Auth;
+using Infrastructure.Identity;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Nadin.Products.Responses;
 using System.Net;
@@ -14,16 +17,22 @@ namespace Nadin.Products.Controllers
         private readonly IUserRegistrationService _registrationService;
         private readonly IUserLoginService _loginService;
         private readonly IUserLogoutService _logoutService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly JwtService _jwtService;
         protected APIResponse _response;
 
         public AccountController(
             IUserRegistrationService registrationService,
             IUserLoginService loginService,
-            IUserLogoutService logoutService)
+            IUserLogoutService logoutService,
+            UserManager<ApplicationUser> userManager,
+            JwtService jwtService)
         {
             _registrationService = registrationService;
             _loginService = loginService;
             _logoutService = logoutService;
+            _userManager = userManager;
+            _jwtService = jwtService;
             _response = new();
         }
 
@@ -83,9 +92,11 @@ namespace Nadin.Products.Controllers
 
                 if (result.Succeeded)
                 {
+                    var user = await _userManager.FindByNameAsync(model.UserName);
+                    var token = _jwtService.GenerateToken(user);
                     _response.StatusCode = HttpStatusCode.OK;
                     _response.IsSuccess = true;
-                    _response.Result = "Logged in successfully.";
+                    _response.Result = new { Message = "Logged in successfully.", Token = token };
                     return Ok(_response);
                 }
                 else
