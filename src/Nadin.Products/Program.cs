@@ -58,6 +58,7 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"])),
         ClockSkew = TimeSpan.Zero
     };
+    options.MapInboundClaims = false;
 });
 
 builder.Services.AddAutoMapper(typeof(MappingConfig));
