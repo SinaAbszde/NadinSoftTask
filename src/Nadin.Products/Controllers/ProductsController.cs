@@ -32,6 +32,7 @@ namespace Nadin.Products.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<APIResponse>> GetAllProducts(string? username)
         {
             Expression<Func<Product, bool>>? userFilter = null;
