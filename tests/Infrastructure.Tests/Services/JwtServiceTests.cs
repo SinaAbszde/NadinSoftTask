@@ -6,7 +6,7 @@ using Moq;
 using NUnit.Framework;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace Infrastructure.Tests
+namespace Infrastructure.Tests.Services
 {
     [TestFixture]
     public class JwtServiceTests
