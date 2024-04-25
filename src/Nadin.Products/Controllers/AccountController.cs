@@ -41,7 +41,7 @@ namespace Nadin.Products.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
 
-        public async Task<IActionResult> Register([FromBody] RegisterDTO model)
+        public async Task<ActionResult<APIResponse>> Register([FromBody] RegisterDTO model)
         {
             if (!ModelState.IsValid)
             {
@@ -83,7 +83,7 @@ namespace Nadin.Products.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Login([FromBody] LoginDTO model)
+        public async Task<ActionResult<APIResponse>> Login([FromBody] LoginDTO model)
         {
             if (!ModelState.IsValid)
             {
@@ -128,7 +128,7 @@ namespace Nadin.Products.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Logout()
+        public async Task<ActionResult<APIResponse>> Logout()
         {
             try
             {
