@@ -122,7 +122,7 @@ namespace Nadin.Products.Tests.Controllers
         [Test]
         public async Task GetProduct_ReturnsProduct_WhenProductExists()
         {
-            var productId = 1; // Use an ID that exists in your test data
+            var productId = 1;
             var product = _products.First(p => p.ID == productId);
             var productDTO = _productDTOs.First(p => p.ID == productId);
             _mockRepo.Setup(repo => repo.GetAsync(It.IsAny<Expression<Func<Product, bool>>>(), It.IsAny<bool>())).ReturnsAsync(product);
@@ -218,7 +218,6 @@ namespace Nadin.Products.Tests.Controllers
         [Test]
         public async Task DeleteProduct_ReturnsNoContent_WhenProductIsDeletedAndUserIsOwner()
         {
-            // Arrange
             var productId = 1;
             var product = _products.First(p => p.ID == productId);
             product.UserId = _testUser.Id;
@@ -226,10 +225,8 @@ namespace Nadin.Products.Tests.Controllers
             _mockRepo.Setup(repo => repo.RemoveAsync(It.IsAny<Product>())).Returns(Task.CompletedTask);
             _mockUserManager.Setup(um => um.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns(_testUser.Id);
 
-            // Act
             var actionResult = await _controller.DeleteProduct(productId);
 
-            // Assert
             Assert.That(actionResult, Is.InstanceOf<ActionResult<APIResponse>>());
             var result = actionResult.Result as ObjectResult;
             Assert.That(result, Is.Not.Null);
@@ -308,7 +305,6 @@ namespace Nadin.Products.Tests.Controllers
         [Test]
         public async Task UpdateProduct_ReturnsNoContent_WhenProductIsUpdatedAndUserIsOwner()
         {
-            // Arrange
             var updateDTO = TestData.GenerateProductUpdateDTO();
             var product = _products.First(p => p.ID == updateDTO.ID);
             product.UserId = _testUser.Id;
@@ -318,10 +314,8 @@ namespace Nadin.Products.Tests.Controllers
             _mockMapper.Setup(mapper => mapper.Map<ProductDTO>(It.IsAny<Product>())).Returns(new ProductDTO());
             _mockUserManager.Setup(um => um.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns(_testUser.Id);
 
-            // Act
             var actionResult = await _controller.UpdateProduct(updateDTO);
 
-            // Assert
             Assert.That(actionResult.Result, Is.InstanceOf<ObjectResult>());
             var objectResult = actionResult.Result as ObjectResult;
             Assert.That(objectResult.StatusCode, Is.EqualTo((int)HttpStatusCode.NoContent));
@@ -333,14 +327,11 @@ namespace Nadin.Products.Tests.Controllers
         [Test]
         public async Task UpdateProduct_ReturnsBadRequest_WhenModelStateIsInvalid()
         {
-            // Arrange
             _controller.ModelState.AddModelError("Name", "The Name field is required.");
             var updateDTO = new ProductUpdateDTO();
 
-            // Act
             var actionResult = await _controller.UpdateProduct(updateDTO);
 
-            // Assert
             Assert.That(actionResult.Result, Is.InstanceOf<BadRequestObjectResult>());
             var badRequestResult = actionResult.Result as BadRequestObjectResult;
             var apiResponse = badRequestResult.Value as APIResponse;
@@ -352,14 +343,11 @@ namespace Nadin.Products.Tests.Controllers
         [Test]
         public async Task UpdateProduct_ReturnsNotFound_WhenProductDoesNotExist()
         {
-            // Arrange
             var updateDTO = TestData.GenerateProductUpdateDTO();
             _mockRepo.Setup(repo => repo.GetAsync(It.IsAny<Expression<Func<Product, bool>>>(), false)).ReturnsAsync((Product)null);
 
-            // Act
             var actionResult = await _controller.UpdateProduct(updateDTO);
 
-            // Assert
             Assert.That(actionResult.Result, Is.InstanceOf<NotFoundObjectResult>());
             var notFoundResult = actionResult.Result as NotFoundObjectResult;
             var apiResponse = notFoundResult.Value as APIResponse;
@@ -370,14 +358,12 @@ namespace Nadin.Products.Tests.Controllers
         [Test]
         public async Task UpdateProduct_ReturnsForbidden_WhenUserIsNotOwner()
         {
-            // Arrange
             var updateDTO = TestData.GenerateProductUpdateDTO();
             var product = _products.First(p => p.ID == updateDTO.ID);
             product.UserId = "some-other-user-id";
             _mockRepo.Setup(repo => repo.GetAsync(It.IsAny<Expression<Func<Product, bool>>>(), false)).ReturnsAsync(product);
             _mockUserManager.Setup(um => um.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns(_testUser.Id);
 
-            // Act
             var actionResult = await _controller.UpdateProduct(updateDTO);
 
             // Assert
@@ -392,14 +378,11 @@ namespace Nadin.Products.Tests.Controllers
         [Test]
         public async Task UpdateProduct_ReturnsInternalServerError_WhenExceptionIsThrown()
         {
-            // Arrange
             var updateDTO = TestData.GenerateProductUpdateDTO();
             _mockRepo.Setup(repo => repo.GetAsync(It.IsAny<Expression<Func<Product, bool>>>(), false)).ThrowsAsync(new Exception("Test exception"));
 
-            // Act
             var actionResult = await _controller.UpdateProduct(updateDTO);
 
-            // Assert
             Assert.That(actionResult.Result, Is.InstanceOf<ObjectResult>());
             var internalServerErrorResult = actionResult.Result as ObjectResult;
             Assert.That(internalServerErrorResult.StatusCode, Is.EqualTo((int)HttpStatusCode.InternalServerError));

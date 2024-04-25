@@ -101,15 +101,12 @@ namespace Nadin.Products.Tests.Controllers
         [Test]
         public async Task Register_ReturnsInternalServerError_WhenExceptionIsThrown()
         {
-            // Arrange
             var model = new RegisterDTO { UserName = "Username", Email = "user@example.com", FullName = "Full Name", Password = "12345678" };
             _mockRegistrationService.Setup(s => s.RegisterUserAsync(model))
                 .ThrowsAsync(new Exception("Internal server error"));
 
-            // Act
             var result = await _controller.Register(model);
 
-            // Assert
             Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
             var internalServerErrorResult = result.Result as ObjectResult;
             var apiResponse = internalServerErrorResult.Value as APIResponse;
