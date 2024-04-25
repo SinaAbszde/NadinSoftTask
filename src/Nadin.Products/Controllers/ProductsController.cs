@@ -56,6 +56,7 @@ namespace Nadin.Products.Controllers
                 _response.Result = _mapper.Map<List<ProductDTO>>(products);
                 _response.StatusCode = HttpStatusCode.OK;
                 _response.IsSuccess = true;
+                return Ok(_response);
             }
             catch (Exception ex)
             {
@@ -64,7 +65,6 @@ namespace Nadin.Products.Controllers
                 _response.ErrorMessages = new List<string> { ex.Message };
                 return StatusCode(500, _response);
             }
-            return _response;
         }
 
         [HttpGet("{id:int}")]
@@ -90,6 +90,7 @@ namespace Nadin.Products.Controllers
                 _response.Result = _mapper.Map<ProductDTO>(product);
                 _response.StatusCode = HttpStatusCode.OK;
                 _response.IsSuccess = true;
+                return Ok(_response);
             }
             catch (Exception ex)
             {
@@ -98,7 +99,6 @@ namespace Nadin.Products.Controllers
                 _response.ErrorMessages = new List<string> { ex.Message };
                 return StatusCode(500, _response);
             }
-            return _response;
         }
 
         [Authorize]
@@ -126,6 +126,8 @@ namespace Nadin.Products.Controllers
                 _response.Result = _mapper.Map<ProductDTO>(product);
                 _response.StatusCode = HttpStatusCode.Created;
                 _response.IsSuccess = true;
+
+                return StatusCode(201, _response);
             }
             catch (DbUpdateException ex)
             {
@@ -146,7 +148,6 @@ namespace Nadin.Products.Controllers
                 _response.ErrorMessages = new List<string> { ex.Message };
                 return StatusCode(500, _response);
             }
-            return _response;
         }
 
         [Authorize]
@@ -164,12 +165,14 @@ namespace Nadin.Products.Controllers
             {
                 if (id == 0)
                 {
+                    _response.IsSuccess = false;
                     _response.StatusCode = HttpStatusCode.BadRequest;
                     return BadRequest(_response);
                 }
                 var product = await _dbProduct.GetAsync(u => u.ID == id);
                 if (product == null)
                 {
+                    _response.IsSuccess = false;
                     _response.StatusCode = HttpStatusCode.NotFound;
                     return NotFound(_response);
                 }
@@ -183,6 +186,7 @@ namespace Nadin.Products.Controllers
                 await _dbProduct.RemoveAsync(product);
                 _response.StatusCode = HttpStatusCode.NoContent;
                 _response.IsSuccess = true;
+                return StatusCode(204, _response);
             }
             catch (Exception ex)
             {
@@ -191,7 +195,6 @@ namespace Nadin.Products.Controllers
                 _response.ErrorMessages = new List<string> { ex.Message };
                 return StatusCode(500, _response);
             }
-            return _response;
         }
 
         [Authorize]
@@ -235,6 +238,7 @@ namespace Nadin.Products.Controllers
                 _response.Result = _mapper.Map<ProductDTO>(updateProduct);
                 _response.StatusCode = HttpStatusCode.NoContent;
                 _response.IsSuccess = true;
+                return StatusCode(204, _response);
             }
             catch (DbUpdateException ex)
             {
@@ -255,7 +259,6 @@ namespace Nadin.Products.Controllers
                 _response.ErrorMessages = new List<string> { ex.Message };
                 return StatusCode(500, _response);
             }
-            return _response;
         }
     }
 }
