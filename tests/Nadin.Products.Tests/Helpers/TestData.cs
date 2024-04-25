@@ -16,7 +16,8 @@ namespace Nadin.Products.Tests.Helpers
                 ManufacturePhone = "1234567890",
                 ManufactureEmail = $"test{_productCounter}@example.com",
                 ProduceDate = DateOnly.FromDateTime(DateTime.Now.AddDays(_productCounter)),
-                IsAvailable = true
+                IsAvailable = true,
+                UserId = "userid"
             };
 
             _productCounter++;
