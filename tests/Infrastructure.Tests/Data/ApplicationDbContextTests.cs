@@ -1,5 +1,6 @@
 ﻿using Domain.Models;
 using Infrastructure.Data;
+using Infrastructure.Identity;
 using Infrastructure.Tests.Helpers;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -23,6 +24,10 @@ namespace Infrastructure.Tests.Data
             _db.Database.OpenConnection();
             _db.Database.EnsureCreated();
 
+            var user = new ApplicationUser { Id = "userid", UserName = "Username", Email = "user@example.com", FullName = "Full Name" };
+            _db.Users.Add(user);
+            await _db.SaveChangesAsync();
+
             _product = TestData.GenerateProduct();
 
             _db.Products.Add(_product);
@@ -38,10 +43,21 @@ namespace Infrastructure.Tests.Data
                 ManufacturePhone = "0987654321",
                 ManufactureEmail = _product.ManufactureEmail,
                 ProduceDate = _product.ProduceDate,
-                IsAvailable = false
+                IsAvailable = false,
+                UserId = "userid"
             };
 
             _db.Products.Add(duplicateProduct);
+
+            Assert.ThrowsAsync<DbUpdateException>(async () => await _db.SaveChangesAsync());
+        }
+
+        [Test]
+        public async Task UniqueIndexOnUserName_ShouldPreventDuplicateUserNames()
+        {
+            var user = new ApplicationUser { Id = "userid1", UserName = "Username", Email = "user@example.com", FullName = "Full Name" };
+
+            _db.Users.Add(user);
 
             Assert.ThrowsAsync<DbUpdateException>(async () => await _db.SaveChangesAsync());
         }
